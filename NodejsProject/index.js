@@ -1,10 +1,19 @@
-luckyDraw("Joe")
-  .then((res) => console.log(res))
-  .then(() => luckyDraw("Caroline"))
-  .then((res2) => console.log(res2))
-  .then(() => luckyDraw("Sabrina"))
-  .then((res3) => console.log(res3))
-  .catch((err) => console.error(err));
+agetResults();
+
+async function agetResults() {
+  try {
+    const tina = await luckyDraw("Tina");
+    console.log(tina);
+
+    const jorge = await luckyDraw("Jorge");
+    console.log(jorge);
+
+    const julien = await luckyDraw("Julien");
+    console.log(julien);
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 function luckyDraw(player) {
   return new Promise((resolve, reject) => {
