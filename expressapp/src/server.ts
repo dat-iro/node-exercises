@@ -1,6 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
 import * as planetController from "./controllers/planets.js";
+import * as userController from "./controllers/users.js";
+
 import pgPromise from "pg-promise";
 import multer from "multer";
 
@@ -19,7 +21,7 @@ const upload = multer({ storage });
 dotenv.config();
 
 export const db = pgPromise()(
-  "postgres://postgres:Matteo291199@localhost:5432/esercizio"
+  "postgres://postgres:matteo291199@localhost:5432/esercizio"
 );
 
 const setupDb = async () => {
@@ -67,6 +69,9 @@ app.post(
   upload.single("image"),
   planetController.updateImageById
 );
+
+app.post("/api/users/signup", userController.signUp);
+app.post("/api/users/signin", userController.signIn);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
