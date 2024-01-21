@@ -31,9 +31,21 @@ const setupDb = async () => {
         name TEXT NOT NULL,
         image TEXT
       );
+
+      DROP TABLE IF EXISTS users;
+
+      CREATE TABLE users(
+        id SERIAL NOT NULL PRIMARY KEY,
+        username TEXT NOT NULL,
+        password TEXT NOT NULL,
+        key TEXT
+      );
     `);
 
   await db.none(`INSERT INTO planets (name) VALUES ('Earth'), ('Mars');`);
+  await db.none(
+    `INSERT INTO users (username, password) VALUES ('dummy', 'dummy');`
+  );
 };
 
 setupDb();
