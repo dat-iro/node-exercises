@@ -1,12 +1,21 @@
-import fs from "fs";
+luckyDraw("Joe")
+  .then((res) => console.log(res))
+  .then(() => luckyDraw("Caroline"))
+  .then((res2) => console.log(res2))
+  .then(() => luckyDraw("Sabrina"))
+  .then((res3) => console.log(res3))
+  .catch((err) => console.error(err));
 
-let data = "This is a test";
+function luckyDraw(player) {
+  return new Promise((resolve, reject) => {
+    const win = Boolean(Math.round(Math.random()));
 
-fs.writeFile("test.txt", data, (err) => {
-  if (err) console.log(err);
-  else {
-    console.log("File written successfully\n");
-    console.log("The written has the following contents:");
-    console.log(fs.readFileSync("test.txt", "utf8"));
-  }
-});
+    process.nextTick(() => {
+      if (win) {
+        resolve(`${player} won a prize in the draw!`);
+      } else {
+        reject(new Error(`${player} lost the draw.`));
+      }
+    });
+  });
+}
