@@ -68,3 +68,23 @@ export const deleteById = async (req: Request, res: Response) => {
     res.status(404).json({ error: "Planet not found" });
   }
 };
+
+export const updateImageById = async (req: Request, res: Response) => {
+  const planetId = parseInt(req.params.id, 10);
+
+  if (!req.file) {
+    return res.status(400).json({ error: "No file uploaded" });
+  }
+
+  const imagePath = req.file?.path;
+
+  try {
+    await db.none("UPDATE planets SET image = $1 WHERE id = $2", [
+      imagePath,
+      planetId,
+    ]);
+    res.status(200).json({ msg: "Planet image updated successfully" });
+  } catch (error) {
+    res.status(404).json({ error: "Planet not found" });
+  }
+};
