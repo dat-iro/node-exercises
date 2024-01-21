@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Joi from "joi";
+import { db } from "../server.js";
 
 type Planet = {
   id: number;
@@ -7,17 +8,6 @@ type Planet = {
 };
 
 export type Planets = Planet[];
-
-export let planets: Planets = [
-  {
-    id: 1,
-    name: "Earth",
-  },
-  {
-    id: 2,
-    name: "Mars",
-  },
-];
 
 const planetSchema = Joi.object({
   name: Joi.string().required(),
@@ -27,13 +17,14 @@ export const validatePlanet = (data: any): Joi.ValidationResult => {
   return planetSchema.validate(data);
 };
 
-export const getAll = (req: Request, res: Response) => {
+export const getAll = async (req: Request, res: Response) => {
+  const planets = await db.many(`SELECT * FROM planets;`);
   res.status(200).json(planets);
 };
 
-export const getOneById = (req: Request, res: Response) => {
+export const getOneById = async (req: Request, res: Response) => {
   const planetId = parseInt(req.params.id, 10);
-  const planet = planets.find((p) => p.id === planetId);
+  const planet = await db.many(`SELECT * FROM planets WHERE id=$1;`, planetId);
 
   if (!planet) {
     return res.status(404).json({ error: "Planet not found" });
@@ -41,49 +32,39 @@ export const getOneById = (req: Request, res: Response) => {
 
   res.status(200).json(planet);
 };
+export const create = async (req: Request, res: Response) => {
+  const { name } = req.body;
 
-export const create = (req: Request, res: Response) => {
-  const { error } = validatePlanet(req.body);
-
-  if (error) {
-    return res.status(400).json({ error: error.details[0].message });
+  try {
+    await db.none("INSERT INTO planets (name) VALUES ($1)", name);
+    res.status(201).json({ msg: "Planet created successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
   }
-
-  const newPlanet: Planet = {
-    id: planets.length + 1,
-    name: req.body.name,
-  };
-
-  planets.push(newPlanet);
-  res.status(201).json({ msg: "Planet created successfully" });
 };
 
-export const updateById = (req: Request, res: Response) => {
-  const { error } = validatePlanet(req.body);
-
-  if (error) {
-    return res.status(400).json({ error: error.details[0].message });
-  }
-
+export const updateById = async (req: Request, res: Response) => {
   const planetId = parseInt(req.params.id, 10);
-  const planetIndex = planets.findIndex((p) => p.id === planetId);
+  const { name } = req.body;
 
-  if (planetIndex === -1) {
-    return res.status(404).json({ error: "Planet not found" });
+  try {
+    await db.none("UPDATE planets SET name = $1 WHERE id = $2", [
+      name,
+      planetId,
+    ]);
+    res.status(200).json({ msg: "Planet updated successfully" });
+  } catch (error) {
+    res.status(404).json({ error: "Planet not found" });
   }
-
-  planets[planetIndex].name = req.body.name;
-  res.status(200).json({ msg: "Planet updated successfully" });
 };
 
-export const deleteById = (req: Request, res: Response) => {
+export const deleteById = async (req: Request, res: Response) => {
   const planetId = parseInt(req.params.id, 10);
-  const planetIndex = planets.findIndex((p) => p.id === planetId);
 
-  if (planetIndex === -1) {
-    return res.status(404).json({ error: "Planet not found" });
+  try {
+    await db.none("DELETE FROM planets WHERE id = $1", planetId);
+    res.status(200).json({ msg: "Planet deleted successfully" });
+  } catch (error) {
+    res.status(404).json({ error: "Planet not found" });
   }
-
-  planets.splice(planetIndex, 1);
-  res.status(200).json({ msg: "Planet deleted successfully" });
 };
