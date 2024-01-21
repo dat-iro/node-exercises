@@ -6,7 +6,7 @@ import pgPromise from "pg-promise";
 dotenv.config();
 
 export const db = pgPromise()(
-  "postgres://postgres:Eno1mario!@localhost:5432/esercizio"
+  "postgres://postgres:Matteo291199@localhost:5432/esercizio"
 );
 
 const setupDb = async () => {
