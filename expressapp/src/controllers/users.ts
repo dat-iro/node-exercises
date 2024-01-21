@@ -49,3 +49,13 @@ export const signIn = async (req: Request, res: Response) => {
     res.status(400).json({ error: "Username or password incorrect!" });
   }
 };
+
+export const logOut = async (req: Request, res: Response) => {
+  const user: any = req.user;
+
+  console.log(user);
+
+  await db.none(`UPDATE users SET key=NULL WHERE id=$1;`, user?.id);
+
+  res.status(200).json("Logged Out!");
+};

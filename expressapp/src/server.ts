@@ -5,6 +5,8 @@ import * as userController from "./controllers/users.js";
 
 import pgPromise from "pg-promise";
 import multer from "multer";
+import { authorize } from "./authorize.js";
+import "./passport.js";
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -72,6 +74,7 @@ app.post(
 
 app.post("/api/users/signup", userController.signUp);
 app.post("/api/users/signin", userController.signIn);
+app.get("/api/users/logout", authorize, userController.logOut);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
